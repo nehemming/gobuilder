@@ -1,0 +1,68 @@
+# circleci build
+version: 2.1
+jobs:
+  check-builds:
+    working_directory: ~/src
+    docker:
+      - image: circleci/golang:1.16
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.6
+          docker_layer_caching: true
+      - run:
+          name: "Test build docker image"
+          command: |
+            set -e
+            TAG="check"
+            echo "Docker build $TAG"
+            docker build -t ${CIRCLE_PROJECT_REPONAME}:$TAG .
+  publish:
+    working_directory: ~/src
+    docker:
+      - image: circleci/golang:1.16
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.6
+          docker_layer_caching: true
+      - run: 
+          name: "Install svu"
+          command: go install -ldflags="-s -w" github.com/caarlos0/svu@latest
+      - run:
+          name: "Publish docker image"
+          command: |
+            set -e
+            VERSION=$(svu --strip-prefix)
+            TAG="$VERSION"
+            REGISTRY=ghcr.io
+            REPO=$REGISTRY/$CIRCLE_PROJECT_USERNAME/${CIRCLE_PROJECT_REPONAME}
+            echo "Docker build $REPO:$TAG"
+            docker build \
+              --build-arg REPO_USER=$CIRCLE_PROJECT_USERNAME  \
+              --build-arg REPO_NAME=$CIRCLE_PROJECT_REPONAME  \
+              --no-cache \
+              -t $REPO:$TAG .
+            docker image tag $REPO:$TAG $REPO:latest
+            echo $GITHUB_TOKEN | docker login $REGISTRY -u $CIRCLE_PROJECT_USERNAME --password-stdin
+            docker push $REPO:$TAG
+            docker push $REPO:latest 
+workflows:
+  version: 2
+  check:
+    jobs:
+      - check-builds:
+          filters:
+            branches:
+              ##ignore: /pull\/[0-9]+/
+              only: /feature\.*/
+            tags:
+              ignore: /^v\d+\.\d+\.\d+.*$/
+  publish:
+    jobs:
+      - publish:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v\d+\.\d+\.\d+.*$/
