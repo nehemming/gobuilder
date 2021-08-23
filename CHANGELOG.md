@@ -5,10 +5,10 @@
 
 > **Versions prior to v0.2.0 are considered defunct and will be deleted**
 
-## v0.2.2
+## v0.3.2
  * Update to cirocket v0.3.0
 
-## v0.2.1
+## v0.3.1
  * Add hugo support
 
 ## v0.2.0
