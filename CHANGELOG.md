@@ -5,6 +5,10 @@
 
 > **Versions prior to v0.2.0 are considered defunct and will be deleted**
 
+
+## v0.3.2
+ * Update cirocket to v0.3.1 and svu to 1.7
+
 ## v0.3.2
  * Update to cirocket v0.3.0
 
@@ -14,3 +18,5 @@
 ## v0.2.0
  * Update cirocket to master @ v0.1.2
  * Update cirocket with new feature developments
+
+
