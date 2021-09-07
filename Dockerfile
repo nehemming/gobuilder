@@ -76,6 +76,8 @@ RUN apt-get update && \
         locales \ 
         make \
         net-tools \
+        nodejs \
+        npm \
         openssh-client \
         parallel \
         sudo \
@@ -87,7 +89,9 @@ RUN apt-get update && \
 
 # Add hugo to the build, used for doocumentation
 RUN curl -LO https://github.com/gohugoio/hugo/releases/download/v0.87.0/hugo_extended_0.87.0_Linux-64bit.deb && \
-    dpkg -i hugo_extended_0.87.0_Linux-64bit.deb
+    dpkg -i hugo_extended_0.87.0_Linux-64bit.deb && \
+    npm install -g postcss-cli && \
+    npm install -g autoprefixer 
 
 COPY --from=builder /go/bin/ /go/bin
 COPY --from=builder /usr/local/bin/upx /usr/local/bin/upx 
